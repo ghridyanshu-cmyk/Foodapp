@@ -22,7 +22,7 @@ const OwnerProductList = () => {
 
         try {
             // 🔑 UPDATED ENDPOINT: Now using the correct route defined in your backend
-            const response = await axios.get('http://localhost:8000/api/v2/product/ownerproducts', {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/product/ownerproducts`, {
                 headers: { 'Authorization': `Bearer ${userToken}` }
             });
             
@@ -56,7 +56,7 @@ const OwnerProductList = () => {
 
         try {
             // Securely send DELETE request with the product ID to the protected route
-            await axios.delete(`http://localhost:8000/api/v2/product/delete/${productId}`, {
+            await axios.delete(`${import.meta.env.VITE_API_URL}/product/delete/${productId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             

@@ -16,7 +16,7 @@ const Card2 = ({ name, id, price, image, qty }) => {
         }
 
         try {
-            await axios.post('http://localhost:8000/api/v2/cart/add', {
+            await axios.post(`${import.meta.env.VITE_API_URL}/cart/add`, {
                 productId: id,
                 qty: newQty - qty, // Calculate the difference to add or subtract
             }, {
@@ -47,7 +47,7 @@ const Card2 = ({ name, id, price, image, qty }) => {
         const qtyDifference = newQty - qty; 
         
         try {
-            await axios.post('http://localhost:8000/api/v2/cart/add', {
+            await axios.post(`${import.meta.env.VITE_API_URL}/cart/add`, {
                 productId: id,
                 qty: qtyDifference,
             }, {
@@ -73,7 +73,7 @@ const Card2 = ({ name, id, price, image, qty }) => {
 
         try {
             // API call to remove item
-            await axios.delete(`http://localhost:8000/api/v2/cart/${id}`, {
+            await axios.delete(`${import.meta.env.VITE_API_URL}/cart/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

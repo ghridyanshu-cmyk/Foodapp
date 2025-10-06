@@ -43,7 +43,7 @@ const VideoUploadModal = ({ isOpen, onClose, token }) => {
 
         try {
             // Send authenticated request to secure route
-            await axios.post('http://localhost:8000/api/v2/videos/share', data, {
+            await axios.post(`${import.meta.env.VITE_API_URL}/videos/share`, data, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     // Content-Type is automatically set by FormData

@@ -187,7 +187,7 @@ const Profile = () => {
 
     // 3. Handle Profile Save (Edit Modal Submission)
     const handleSaveProfile = async (formData, imageFile) => {
-        const url = 'http://localhost:8000/api/v2/user/update';
+        const url = `${import.meta.env.VITE_API_URL}/user/update`;
         const data = new FormData();
 
         // Append form text data

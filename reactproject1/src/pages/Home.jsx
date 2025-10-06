@@ -25,7 +25,7 @@ const Home = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const res = await axios.get("http://localhost:8000/api/v2/product/");
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/product/`);
                 setProducts(res.data.products || []);
                 setFilteredProducts(res.data.products || []);
             } catch (err) {

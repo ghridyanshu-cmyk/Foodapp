@@ -32,7 +32,7 @@ const LikeButton = ({ videoId, initialIsLiked, initialLikesCount }) => {
 
         try {
             // Send authenticated request to the backend toggle endpoint
-            const response = await axios.post(`http://localhost:8000/api/v2/likes/toggle/${videoId}`, {}, {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/likes/toggle/${videoId}`, {}, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

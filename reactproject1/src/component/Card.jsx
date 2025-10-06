@@ -34,7 +34,7 @@ const Card = ({ name, image, id, price, type }) => {
         
         try {
             // 1. Send authenticated request to the backend
-            await axios.post('http://localhost:8000/api/v2/cart/add', {
+            await axios.post(`${import.meta.env.VITE_API_URL}/cart/add`, {
                 productId: id,
                 qty: 1,
             }, {

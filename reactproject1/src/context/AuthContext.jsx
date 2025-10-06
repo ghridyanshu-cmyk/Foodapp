@@ -53,7 +53,7 @@ export const AuthContextProvider = ({ children }) => {
             // Fetch owner profile from backend if token exists
             (async () => {
                 try {
-                    const res = await fetch("http://localhost:8000/api/v2/owner/profile", {
+                    const res = await fetch(`${import.meta.env.VITE_API_URL}/owner/profile`, {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${token}`,

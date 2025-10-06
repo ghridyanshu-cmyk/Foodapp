@@ -25,7 +25,7 @@ const OwnerVideoList = () => {
 
         try {
             // Fetch videos added by the current owner
-            const response = await axios.get('http://localhost:8000/api/v2/videos/ownervideos', {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/videos/ownervideos`, {
                 headers: { 'Authorization': `Bearer ${userToken}` }
             });
             // Handle ApiResponse structure (response.data.data)

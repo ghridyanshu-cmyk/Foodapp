@@ -23,7 +23,7 @@ const OwnerLogin = () => {
 
         try {
             // 1. Attempt standard login
-            const response = await axios.post('http://localhost:8000/api/v2/owner/login', {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/owner/login`, {
                 email,
                 password
             });

@@ -20,7 +20,7 @@ const OwnerRegister = () => {
 
         try {
             // CRITICAL: Connect to your standard registration endpoint but include the role
-            const response = await axios.post('http://localhost:8000/api/v2/owner/register', {
+            const response = await axios.post(`${import.meta.env.VITE_API_URL}/owner/register`, {
                 name,
                 email,
                 password,

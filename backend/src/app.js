@@ -7,7 +7,7 @@ const app = express();
 
 app.use(cors(
     {
-        origin: 'https://foodapp-y776.vercel.app',
+        origin: '*',
         credentials: true,
     }
 ));

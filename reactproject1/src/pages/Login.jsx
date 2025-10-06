@@ -1,5 +1,5 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom'; // 👈 Imported Link
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext'; 
 
@@ -19,6 +19,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            // Using environment variable VITE_API_URL directly in the POST request URL
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/user/login`, {
                 email,
                 password
@@ -37,7 +38,7 @@ const Login = () => {
                 
                 console.log("Login successful. Token saved and Context updated. Navigating now.");
                 
-                // 3. 🚨 FIX: Immediate and direct navigation after successful state update.
+                // 3. Immediate and direct navigation after successful state update.
                 navigate('/userprofilepage'); 
                 
             } else {
@@ -84,7 +85,9 @@ const Login = () => {
                         </div>
                         <div className="flex justify-between text-sm mb-2">
                             <a href="#" className="text-gray-500 hover:underline">forget password</a>
-                            <a href="/register" className="text-green-600 hover:underline">Sign up</a>
+                            
+                            {/* 💡 FIX: Replaced <a> with Link and href with to */}
+                            <Link to="/register" className="text-green-600 hover:underline">Sign up</Link>
                         </div>
                         <button
                             type="submit"

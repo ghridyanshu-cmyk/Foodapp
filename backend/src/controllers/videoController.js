@@ -24,11 +24,8 @@ const shareVideo = asyncHandler(async (req, res) => {
         const videoFile = req.files['videoFile'][0];
         const uploadResult = await uploadOnCloudinary(videoFile.path);
         
-        try {
-            fs.unlinkSync(videoFile.path);
-        } catch (err) {
-            console.warn('Failed to remove temp file:', err);
-        }
+        // Removed the redundant fs.unlinkSync(videoFile.path) block
+        // as cleanup is now handled safely within uploadOnCloudinary.
 
         if (!uploadResult || !uploadResult.secure_url) {
             throw new ApiError(500, "Cloudinary upload failed.");

@@ -44,7 +44,7 @@ const Home = () => {
             }
 
             try {
-             const res = await axios.get("http://localhost:8000/api/v2/cart/", {
+             const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v2/cart/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }

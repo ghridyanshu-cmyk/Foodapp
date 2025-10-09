@@ -141,7 +141,7 @@ const Profile = () => {
         const fetchProfile = async () => {
             try {
                 // Fetch user data securely
-                const response = await axios.get('http://localhost:8000/api/v2/user/profile', {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/user/profile`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 

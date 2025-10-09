@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { deleteVideo, getFeedVideos, getOwnerVideos, shareVideo } from '../controllers/videoController.js';
-import { verifyJWT } from '../middleware/authMiddleware.js';
+// import { verifyJWT } from '../middleware/authMiddleware.js';
 import {verifyJWT as authOwner } from '../middleware/authMiddleware.owner.js';
 import upload from '../middleware/multerMiddleware.js';
 import { toggleVideoLike } from '../controllers/likeController.js';

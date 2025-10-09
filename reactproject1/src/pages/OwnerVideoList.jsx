@@ -56,7 +56,7 @@ const OwnerVideoList = () => {
 
         try {
             // Securely send DELETE request to the protected route
-            await axios.delete(`http://localhost:8000/api/v2/videos/delete/${videoId}`, {
+            await axios.delete(`${import.meta.env.VITE_API_URL}/videos/delete/${videoId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             

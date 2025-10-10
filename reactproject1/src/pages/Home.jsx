@@ -36,6 +36,8 @@ const Home = () => {
     useEffect(() => {
         const fetchUserCart = async () => {
             if (!token) {
+                setShowCart(false); 
+                
                 const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
                 dispatch(setCartItems(localCart));
                 return;
@@ -62,6 +64,7 @@ const Home = () => {
                 if (err.response?.status === 401) {
                     dispatch(setCartItems([]));
                     localStorage.removeItem('cart');
+                    setShowCart(false);
                 } else {
                     const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
                     dispatch(setCartItems(localCart));
@@ -70,7 +73,7 @@ const Home = () => {
         };
 
         fetchUserCart();
-    }, [token, dispatch]);
+    }, [token, dispatch, setShowCart]); 
 
     useEffect(() => {
         let filtered = products;

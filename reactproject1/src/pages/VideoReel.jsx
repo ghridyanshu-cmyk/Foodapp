@@ -226,7 +226,7 @@ const VideoReel = () => {
             setLoadingFeed(true);
             try {
                 // Fetch feed (public route, no token needed)
-                const response = await axios.get('http://localhost:8000/api/v2/videos/feed');
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/videos/feed`);
                 // Backend returns: { data: [{...}, {...}] }
                 const fetchedVideos = response.data.data || response.data;
                 setVideos(fetchedVideos);

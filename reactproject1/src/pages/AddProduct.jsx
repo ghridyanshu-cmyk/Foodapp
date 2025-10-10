@@ -65,7 +65,8 @@ const AddProduct = () => {
         try {
             const response = await axios.post(
                 `${import.meta.env.VITE_API_URL}/product/addproduct`,
-                formData
+                formData,
+                {withCredentials: true,}
             );
             
             console.log('Success:', response.data);

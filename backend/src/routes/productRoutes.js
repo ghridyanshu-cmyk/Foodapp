@@ -2,14 +2,14 @@ import { Router } from "express";
 import upload from "../middleware/multerMiddleware.js";
 
 import { addProduct, getProduct, deleteProduct, getOwnerProducts } from "../controllers/productController.js";
-import { verifyJWT } from "../middleware/authMiddleware.owner.js";
+import { verifyJWT as authowner } from "../middleware/authMiddleware.owner.js";
 
 const router = Router();
 
-router.route("/addproduct").post(verifyJWT,upload.fields([{ name: "image", maxCount: 1 }]), addProduct);
+router.route("/addproduct").post(authowner,upload.fields([{ name: "image", maxCount: 1 }]), addProduct);
 router.route("/").get(getProduct);
-router.route("/delete/:productId").delete(verifyJWT,deleteProduct);
-router.route("/ownerproducts").get(verifyJWT,getOwnerProducts);
+router.route("/delete/:productId").delete(authowner,deleteProduct);
+router.route("/ownerproducts").get(authowner,getOwnerProducts);
 
 
 export default router;

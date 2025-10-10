@@ -22,9 +22,7 @@ const Card = ({ name, image, id, price, type }) => {
             await axios.post(`${import.meta.env.VITE_API_URL}/cart/add`, {
                 productId: id,
                 qty: 1,
-            }, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            }, { headers: { Authorization: `Bearer ${token}` }});
 
             const newItem = { id, name, price, image, type, qty: 1 };
             dispatch(AddItem(newItem));
@@ -32,12 +30,9 @@ const Card = ({ name, image, id, price, type }) => {
             const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
             localCart.push(newItem);
             localStorage.setItem('cart', JSON.stringify(localCart));
-
         } catch (error) {
             console.error("Failed to add to cart:", error);
-            if (error.response?.status === 401) {
-                navigate('/login');
-            }
+            if (error.response?.status === 401) navigate('/login');
         }
     };
 
@@ -50,14 +45,10 @@ const Card = ({ name, image, id, price, type }) => {
             <div className='w-full flex justify-between items-center'>
                 <div className='text-lg font-bold text-green-500'>Rs {price}</div>
                 <div className='flex justify-center items-center gap-2 text-green-500 text-bold text-lg'>
-                    {type === "veg" ? <LuLeafyGreen /> : <GiChickenOven />}
-                    <span>{type}</span>
+                    {type === "veg" ? <LuLeafyGreen /> : <GiChickenOven />}<span>{type}</span>
                 </div>
             </div>
-            <button
-                className='w-full p-3 bg-green-500 hover:bg-green-400 rounded-lg text-white transition-all cursor-pointer'
-                onClick={handleAddToCart}
-            >
+            <button className='w-full p-3 bg-green-500 hover:bg-green-400 rounded-lg text-white transition-all cursor-pointer' onClick={handleAddToCart}>
                 Add to dish
             </button>
         </div>

@@ -40,12 +40,10 @@ const Home = () => {
                 dispatch(setCartItems(localCart));
                 return;
             }
-
             try {
                 const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v2/cart/`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-
                 const normalizedCartItems = res.data.cartItems.map(item => ({
                     id: item.productId._id,
                     name: item.productId.name,
@@ -54,21 +52,14 @@ const Home = () => {
                     type: item.productId.type,
                     qty: item.qty
                 }));
-
                 dispatch(setCartItems(normalizedCartItems));
                 localStorage.setItem('cart', JSON.stringify(normalizedCartItems));
             } catch (err) {
                 console.error("Error fetching cart:", err);
-                if (err.response?.status === 401) {
-                    dispatch(setCartItems([]));
-                    localStorage.removeItem('cart');
-                } else {
-                    const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-                    dispatch(setCartItems(localCart));
-                }
+                dispatch(setCartItems([]));
+                localStorage.removeItem('cart');
             }
         };
-
         fetchUserCart();
     }, [token, dispatch]);
 
@@ -79,10 +70,9 @@ const Home = () => {
         }
         if (input) {
             const search = input.toLowerCase();
-            filtered = filtered.filter(
-                item =>
-                    item.name.toLowerCase().includes(search) ||
-                    (item.category && item.category.toLowerCase().includes(search))
+            filtered = filtered.filter(item =>
+                item.name.toLowerCase().includes(search) ||
+                (item.category && item.category.toLowerCase().includes(search))
             );
         }
         setFilteredProducts(filtered);
@@ -99,7 +89,6 @@ const Home = () => {
     return (
         <div className='bg-slate-200 w-full min-h-[100vh]'>
             <Nav />
-
             <div className='flex flex-wrap justify-center items-center gap-5 w-[100%]'>
                 {Categories.map(item => (
                     <div
@@ -136,32 +125,33 @@ const Home = () => {
 
                 {items.length > 0
                     ? <>
-                          <div className='w-full mt-9 flex flex-col gap-8'>
-                              {items.map(item => (
-                                  <Card2 key={item.id} name={item.name} price={item.price} image={item.image} id={item.id} qty={item.qty} />
-                              ))}
-                          </div>
+                        <div className='w-full mt-9 flex flex-col gap-8'>
+                            {items.map(item => (
+                                <Card2 key={item.id} name={item.name} price={item.price} image={item.image} id={item.id} qty={item.qty} />
+                            ))}
+                        </div>
 
-                          <div className='w-full border-t-2 border-b-2 border-gray-400 mt-7 flex flex-col gap-2 p-8'>
-                              <div className='w-full flex justify-between items-center'>
-                                  <span className='text-lg text-gray-600 font-semibold'>SubTotal</span>
-                                  <span className='text-green-400 font-semibold text-lg'>Rs {subTotal}/-</span>
-                              </div>
-                              <div className='w-full flex justify-between items-center'>
-                                  <span className='text-lg text-gray-600 font-semibold'>Delivery Fee</span>
-                                  <span className='text-green-400 font-semibold text-lg'>Rs {deliveryFee}/-</span>
-                              </div>
-                              <div className='w-full flex justify-between items-center'>
-                                  <span className='text-lg text-gray-600 font-semibold'>Taxes</span>
-                                  <span className='text-green-400 font-semibold text-lg'>Rs {taxes}/-</span>
-                              </div>
-                          </div>
-                          <div className='w-full flex justify-between items-center p-9'>
-                              <span className='text-2xl text-gray-600 font-semibold'>Total</span>
-                              <span className='text-green-400 font-semibold text-2xl'>Rs {total}/-</span>
-                          </div>
-                          <button className='w-[80%] p-3 bg-green-500 hover:bg-green-400 rounded-lg text-white transition-all cursor-pointer' onClick={() => navigate("/payment")}>Place Order</button>
-                      </>
+                        <div className='w-full border-t-2 border-b-2 border-gray-400 mt-7 flex flex-col gap-2 p-8'>
+                            <div className='w-full flex justify-between items-center'>
+                                <span className='text-lg text-gray-600 font-semibold'>SubTotal</span>
+                                <span className='text-green-400 font-semibold text-lg'>Rs {subTotal}/-</span>
+                            </div>
+                            <div className='w-full flex justify-between items-center'>
+                                <span className='text-lg text-gray-600 font-semibold'>Delivery Fee</span>
+                                <span className='text-green-400 font-semibold text-lg'>Rs {deliveryFee}/-</span>
+                            </div>
+                            <div className='w-full flex justify-between items-center'>
+                                <span className='text-lg text-gray-600 font-semibold'>Taxes</span>
+                                <span className='text-green-400 font-semibold text-lg'>Rs {taxes}/-</span>
+                            </div>
+                        </div>
+
+                        <div className='w-full flex justify-between items-center p-9'>
+                            <span className='text-2xl text-gray-600 font-semibold'>Total</span>
+                            <span className='text-green-400 font-semibold text-2xl'>Rs {total}/-</span>
+                        </div>
+                        <button className='w-[80%] p-3 bg-green-500 hover:bg-green-400 rounded-lg text-white transition-all cursor-pointer' onClick={() => navigate("/payment")}>Place Order</button>
+                    </>
                     : <div className='text-center text-2xl text-green-500 font-semibold pt-5'>Empty Cart</div>}
             </div>
         </div>

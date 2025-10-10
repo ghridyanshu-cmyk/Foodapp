@@ -1,55 +1,50 @@
 import React, { useContext, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // 👈 Imported Link
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { AuthContext } from '../context/AuthContext'; 
+import { AuthContext } from '../context/AuthContext';
 
 const Login = () => {
-    // 🔑 We only need setToken here, not isLoggedIn, since we navigate immediately
-    const { setToken } = useContext(AuthContext); 
+    const { setToken } = useContext(AuthContext);
     const navigate = useNavigate();
-    
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    
-    // 🚨 The useEffect hook for navigation is removed. Navigation will now happen
-    // synchronously inside handleSubmit after the API call succeeds.
-    
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError('');
+
         try {
-            // Using environment variable VITE_API_URL directly in the POST request URL
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/user/login`, {
                 email,
                 password
             });
-            
-            // Determine where the tokens are (either directly in response.data or nested in response.data.data)
+
             const tokenPayload = response.data.data || response.data;
-            const userToken = tokenPayload.accessToken || tokenPayload.token || tokenPayload.jwt; 
-            
-            if (userToken) {
-                // 1. Save to localStorage (for persistence across browser restarts).
-                localStorage.setItem('authToken', userToken); 
-                
-                // 2. Update the React Context state instantly.
-                setToken(userToken); 
-                
-                console.log("Login successful. Token saved and Context updated. Navigating now.");
-                
-                // 3. Immediate and direct navigation after successful state update.
-                navigate('/userprofilepage'); 
-                
-            } else {
-                console.error("Login failed: Token missing in response or key name incorrect.", response.data);
+            const userToken = tokenPayload.accessToken;
+
+            if (!userToken) {
+                setError("Login failed: Token missing in response.");
+                setLoading(false);
+                return;
             }
-        } catch (error) {
-            console.error(error);
-            // Optionally show error message from backend (e.g., Invalid credentials)
+
+            localStorage.setItem('authToken', userToken);
+            setToken(userToken);
+            navigate('/userprofilepage');
+
+        } catch (err) {
+            setError(err.response?.data?.message || 'Login failed. Check credentials.');
+            console.error("Login Error:", err);
+        } finally {
+            setLoading(false);
         }
     };
-    
+
     return (
         <div className="flex min-h-screen bg-gradient-to-r from-gray-200 to-green-500">
             <div className="flex flex-1 items-center justify-center">
@@ -59,7 +54,14 @@ const Login = () => {
                             <span className="text-white text-2xl font-bold">A</span>
                         </div>
                     </div>
-                    <h2 className="text-2xl font-bold text-center mb-6">Login In</h2>
+                    <h2 className="text-2xl font-bold text-center mb-6">User Login</h2>
+
+                    {error && (
+                        <div className="p-3 mb-4 text-sm bg-red-100 text-red-700 rounded-lg">
+                            {error}
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <input
                             type="email"
@@ -71,7 +73,7 @@ const Login = () => {
                         />
                         <div className="relative">
                             <input
-                                type={showPassword ? "text" : "password"}
+                                type={showPassword ? 'text' : 'password'}
                                 placeholder="Password"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
@@ -81,35 +83,28 @@ const Login = () => {
                             <span
                                 className="absolute right-3 top-2 cursor-pointer text-gray-500"
                                 onClick={() => setShowPassword(!showPassword)}
-                            >{showPassword ? '🙈' : '👁️'}</span>
+                            >
+                                {showPassword ? '🙈' : '👁️'}
+                            </span>
                         </div>
+
                         <div className="flex justify-between text-sm mb-2">
-                            <a href="#" className="text-gray-500 hover:underline">forget password</a>
-                            
-                            {/* 💡 FIX: Replaced <a> with Link and href with to */}
+                            <a href="#" className="text-gray-500 hover:underline">Forget password</a>
                             <Link to="/register" className="text-green-600 hover:underline">Sign up</Link>
                         </div>
+
                         <button
                             type="submit"
-                            className="w-full py-2 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 transition-all"
-                        >Login in</button>
+                            disabled={loading}
+                            className={`w-full py-2 rounded-lg text-white font-semibold transition-all ${loading ? 'bg-gray-400' : 'bg-green-500 hover:bg-green-600'}`}
+                        >
+                            {loading ? 'Logging in...' : 'Login'}
+                        </button>
                     </form>
-                    <div className="flex justify-center gap-4 mt-6">
-                        <button className="bg-white border rounded-full p-2 shadow hover:bg-gray-100"><span className="text-xl">G</span></button>
-                        <button className="bg-white border rounded-full p-2 shadow hover:bg-gray-100"><span className="text-xl">F</span></button>
-                    </div>
                 </div>
-            </div>
-            <div className="hidden md:flex flex-1 items-center justify-center">
-                <svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="50" y="80" width="180" height="60" rx="10" fill="#222" />
-                    <rect x="70" y="60" width="140" height="40" rx="8" fill="#222" />
-                    <circle cx="70" cy="150" r="15" fill="#222" />
-                    <circle cx="210" cy="150" r="15" fill="#222" />
-                </svg>
             </div>
         </div>
     );
 };
 
-export default Login
+export default Login;

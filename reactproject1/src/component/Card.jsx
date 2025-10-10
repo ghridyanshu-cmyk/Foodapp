@@ -6,11 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { AddItem } from '../redux/cartSlice';
 import axios from 'axios';
+import { dataContext } from '../context/UserContext';
 
 const Card = ({ name, image, id, price, type }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { token } = useContext(AuthContext);
+    const { setShowCart } = useContext(dataContext);
 
     const handleAddToCart = async () => {
         if (!token) {
@@ -29,9 +31,16 @@ const Card = ({ name, image, id, price, type }) => {
             const newItem = { id, name, price, image, type, qty: 1 };
             dispatch(AddItem(newItem));
 
-            const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-            localCart.push(newItem);
+            let localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const existingItemIndex = localCart.findIndex(item => item.id === id);
+            if (existingItemIndex > -1) {
+                localCart[existingItemIndex].qty += 1;
+            } else {
+                localCart.push(newItem);
+            }
             localStorage.setItem('cart', JSON.stringify(localCart));
+
+            setShowCart(true);
 
         } catch (error) {
             console.error("Failed to add to cart:", error);

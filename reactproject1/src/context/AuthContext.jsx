@@ -1,63 +1,56 @@
 import React, { createContext, useState, useEffect } from 'react';
 
+// 1. Create the Context object
 export const AuthContext = createContext({
     token: null,
     setToken: () => {},
     isLoggedIn: false,
-    userData: null,
-    setUserData: () => {},
-    logout: () => {},
+    userData: null, 
+    setUserData: () => {}, 
 });
 
-const TOKEN_STORAGE_KEY = 'userToken'; 
-
+// 2. Provider Component
 export const AuthContextProvider = ({ children }) => {
+    // State to hold the token
     const [token, setToken] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userData, setUserData] = useState(null);
+    // State to hold profile data (name, email, role)
+    const [userData, setUserData] = useState(null); 
 
-    const logout = () => {
-        setToken(null);
-        setUserData(null);
-        setIsLoggedIn(false);
+    // Common keys to check in localStorage for robustness
+    const commonTokenKeys = ['token', 'authToken', 'accessToken', 'userJWT'];
 
-        localStorage.removeItem(TOKEN_STORAGE_KEY);
-        
-        ['token', 'authToken', 'accessToken', 'userJWT'].forEach(key => {
-             if (key !== TOKEN_STORAGE_KEY) localStorage.removeItem(key);
-        });
-    };
-
+    // --- 3. Effect to fetch token from localStorage on mount ---
     useEffect(() => {
-        const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+        let storedToken = null;
         
-        if (storedToken) {
-            setToken(storedToken);
-        } else {
-            let oldToken = null;
-            const commonTokenKeys = ['token', 'authToken', 'accessToken', 'userJWT'];
-            for (const key of commonTokenKeys) {
-                const value = localStorage.getItem(key);
-                if (value) {
-                    oldToken = value;
-                    localStorage.removeItem(key);
-                    break;
-                }
-            }
-            if (oldToken) {
-                localStorage.setItem(TOKEN_STORAGE_KEY, oldToken);
-                setToken(oldToken);
+        // Loop through common keys to find the active token
+        for (const key of commonTokenKeys) {
+            const value = localStorage.getItem(key);
+            if (value) {
+                storedToken = value;
+                break;
             }
         }
+        
+        // If a token is found, set it and mark as logged in
+        if (storedToken) {
+            setToken(storedToken);
+            // NOTE: Full userData is usually fetched in App.js or a central hook
+            // after the token is set here, to ensure role is also loaded.
+        }
+
     }, []);
 
+    // --- 4. Update login status whenever token state changes ---
     useEffect(() => {
         const loggedIn = !!token;
         setIsLoggedIn(loggedIn);
-
-        if (token) {
-            localStorage.setItem(TOKEN_STORAGE_KEY, token);
-
+        // If logging out, clear user data
+        if (!loggedIn) {
+            setUserData(null);
+        } else {
+            // Fetch owner profile from backend if token exists
             (async () => {
                 try {
                     const res = await fetch(`${import.meta.env.VITE_API_URL}/owner/profile`, {
@@ -70,25 +63,22 @@ export const AuthContextProvider = ({ children }) => {
                         const data = await res.json();
                         setUserData(data);
                     } else {
-                        logout(); 
+                        setUserData(null);
                     }
                 } catch (err) {
                     setUserData(null);
                 }
             })();
-        } else {
-            setUserData(null);
-            localStorage.removeItem(TOKEN_STORAGE_KEY);
         }
     }, [token]);
 
+    // 5. Value provided to consuming components
     const contextValue = {
         token,
         setToken,
         isLoggedIn,
-        userData,
-        setUserData,
-        logout,
+        userData, 
+        setUserData, 
     };
 
     return (

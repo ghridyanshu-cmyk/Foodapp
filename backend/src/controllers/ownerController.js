@@ -5,9 +5,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-// Ensure you have these utilities defined or imported elsewhere if used globally
 
-// --- Helper Function ---
 const generateAccessAndRefreshToken = async (ownerId) => { 
     try {
         const owner = await Owner.findById(ownerId);
@@ -24,8 +22,6 @@ const generateAccessAndRefreshToken = async (ownerId) => {
          throw new ApiError(500, error.message || "Something went wrong during token generation");
     }
 };
-
-// --- Authentication Controllers ---
 
 const registerOwner = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
@@ -53,61 +49,54 @@ const loginOwner = asyncHandler(async (req, res) => {
     if ([email, password].some((field) => !field || field.trim() === "")) {
         return res.status(400).json({ message: "All fields are required" });
     }
+
     const owner = await Owner.findOne({ email });
-    if (!owner) {
-        throw new ApiError(404, "Owner not found");
-    }
+    if (!owner) throw new ApiError(404, "Owner not found");
+
     const isPasswordValid = await owner.isPasswordCorrect(password);
-    if (!isPasswordValid) {
-        throw new ApiError(400, "Email or password is incorrect");
-    }
-    
+    if (!isPasswordValid) throw new ApiError(400, "Email or password is incorrect");
+
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(owner._id);
-    
+
     const loggedInOwner = await Owner.findById(owner._id).select("-password -refreshToken");
-    
-    const cookieOptions = { httpOnly: true, secure: true };
-    
+
+    const cookieOptions = {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+    };
+
     res.status(200)
         .cookie("refreshToken", refreshToken, cookieOptions)
         .cookie("accessToken", accessToken, cookieOptions)
         .json(
-            new ApiResponse(200,
-                {
-                    owner: loggedInOwner,
-                    accessToken,
-                    refreshToken
-                },
+            new ApiResponse(
+                200,
+                { owner: loggedInOwner, accessToken, refreshToken },
                 "Owner logged in successfully"
             )
         );
 });
 
 const logoutOwner = asyncHandler(async (req, res) => {
-    // Note: Assuming verifyJWT middleware attaches the owner object to req.user
-    // If your middleware attaches to req.owner, change req.user._id to req.owner._id
-    
-    await Owner.findByIdAndUpdate(req.user._id, // Use req.user._id as standardized
-        { $set: { refreshToken: undefined } },
+    await Owner.findByIdAndUpdate(req.user._id, 
+        { $set: { refreshToken: undefined } }, 
         { new: true }
     );
-    
+
     const expiredOptions = { 
         httpOnly: true, 
         secure: true, 
-        expires: new Date(Date.now()) // Instantly expires the cookie
+        expires: new Date(Date.now())
     };
-    
-    // FIX: Clear cookies correctly by setting value to "" and setting the expiration
+
     return res.status(200)
-        .cookie("refreshToken", "", expiredOptions) 
+        .cookie("refreshToken", "", expiredOptions)
         .cookie("accessToken", "", expiredOptions)
         .json(new ApiResponse(200, {}, "Owner logged out successfully"));
 });
 
-// Get owner profile (name, email, avatar)
 const getOwnerProfile = asyncHandler(async (req, res) => {
-    // Assuming verifyJWT middleware attaches owner info to req.user
     const ownerId = req.user?._id || req.owner?._id;
     if (!ownerId) {
         return res.status(401).json({ message: "Unauthorized" });

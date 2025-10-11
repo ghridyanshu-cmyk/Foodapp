@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { clearCart } from '../redux/cartSlice';
+import { persistor } from '../redux/store';
 
 export const AuthContext = createContext({
   token: null,
@@ -53,8 +54,8 @@ export const AuthContextProvider = ({ children }) => {
 
   const logout = () => {
     commonTokenKeys.forEach(key => localStorage.removeItem(key));
-    localStorage.removeItem('cart');
     dispatch(clearCart());
+    persistor.purge();
     setToken(null);
     setUserData(null);
   };

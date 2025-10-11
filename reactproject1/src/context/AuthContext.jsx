@@ -1,26 +1,30 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { clearCart } from '../redux/cartSlice';
 
+// 1. Create the Context object
 export const AuthContext = createContext({
     token: null,
     setToken: () => {},
     isLoggedIn: false,
-    userData: null,
-    setUserData: () => {},
-    logout: () => {},
+    userData: null, 
+    setUserData: () => {}, 
 });
 
+// 2. Provider Component
 export const AuthContextProvider = ({ children }) => {
+    // State to hold the token
     const [token, setToken] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userData, setUserData] = useState(null);
-    const dispatch = useDispatch();
+    // State to hold profile data (name, email, role)
+    const [userData, setUserData] = useState(null); 
 
+    // Common keys to check in localStorage for robustness
     const commonTokenKeys = ['token', 'authToken', 'accessToken', 'userJWT'];
 
+    // --- 3. Effect to fetch token from localStorage on mount ---
     useEffect(() => {
         let storedToken = null;
+        
+        // Loop through common keys to find the active token
         for (const key of commonTokenKeys) {
             const value = localStorage.getItem(key);
             if (value) {
@@ -28,20 +32,32 @@ export const AuthContextProvider = ({ children }) => {
                 break;
             }
         }
-        if (storedToken) setToken(storedToken);
+        
+        // If a token is found, set it and mark as logged in
+        if (storedToken) {
+            setToken(storedToken);
+            // NOTE: Full userData is usually fetched in App.js or a central hook
+            // after the token is set here, to ensure role is also loaded.
+        }
+
     }, []);
 
+    // --- 4. Update login status whenever token state changes ---
     useEffect(() => {
         const loggedIn = !!token;
         setIsLoggedIn(loggedIn);
+        // If logging out, clear user data
         if (!loggedIn) {
             setUserData(null);
         } else {
+            // Fetch owner profile from backend if token exists
             (async () => {
                 try {
                     const res = await fetch(`${import.meta.env.VITE_API_URL}/owner/profile`, {
                         method: "GET",
-                        headers: { "Authorization": `Bearer ${token}` },
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                        },
                     });
                     if (res.ok) {
                         const data = await res.json();
@@ -49,28 +65,20 @@ export const AuthContextProvider = ({ children }) => {
                     } else {
                         setUserData(null);
                     }
-                } catch {
+                } catch (err) {
                     setUserData(null);
                 }
             })();
         }
     }, [token]);
 
-    const logout = () => {
-        commonTokenKeys.forEach(key => localStorage.removeItem(key));
-        localStorage.removeItem('cart');
-        dispatch(clearCart());
-        setToken(null);
-        setUserData(null);
-    };
-
+    // 5. Value provided to consuming components
     const contextValue = {
         token,
         setToken,
         isLoggedIn,
-        userData,
-        setUserData,
-        logout,
+        userData, 
+        setUserData, 
     };
 
     return (

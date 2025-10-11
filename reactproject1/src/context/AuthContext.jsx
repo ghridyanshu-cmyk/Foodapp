@@ -53,7 +53,6 @@ export const AuthContextProvider = ({ children }) => {
 
   const logout = () => {
     commonTokenKeys.forEach(key => localStorage.removeItem(key));
-    localStorage.removeItem('cart');
     dispatch(clearCart());
     setToken(null);
     setUserData(null);

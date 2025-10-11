@@ -2,13 +2,14 @@ import React, { useContext, useEffect } from 'react';
 import { MdFastfood } from "react-icons/md";
 import { IoMdSearch } from "react-icons/io";
 import { HiShoppingBag } from "react-icons/hi2";
+import { dataContext } from '../context/UserContext';
 import { AuthContext } from '../context/AuthContext';
 import { food_items } from '../Food';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const Nav = () => {
-  const { input, setInput, cate, setCate, showCart, setShowCart } = useContext(AuthContext);
+  const { input, setInput, cate, setCate, showCart, setShowCart } = useContext(dataContext);
   const { isLoggedIn } = useContext(AuthContext);
   const navigate = useNavigate();
 

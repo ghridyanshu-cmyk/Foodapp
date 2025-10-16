@@ -15,6 +15,7 @@ function UserContext({ children }) {
 
   useEffect(() => {
     if (!ready) return;
+
     if (!isLoggedIn) {
       dispatch(clearCart());
       localStorage.removeItem('cart');

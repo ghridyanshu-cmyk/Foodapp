@@ -8,13 +8,13 @@ import UserContext from "./context/UserContext";
 function App() {
   return (
     <Provider store={store}>
-      <AuthContextProvider>
-        <UserContext>
+      <UserContext>
+        <AuthContextProvider>
           <div className="App">
             <AppRoutes />
           </div>
-        </UserContext>
-      </AuthContextProvider>
+        </AuthContextProvider>
+      </UserContext>
     </Provider>
   );
 }

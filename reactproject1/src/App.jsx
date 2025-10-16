@@ -1,6 +1,6 @@
 import React from "react";
 import AppRoutes from "./routes/AppRoutes";
-import { Provider } from 'react-redux'; 
+import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import { AuthContextProvider } from "./context/AuthContext";
 import UserContext from "./context/UserContext";
@@ -8,14 +8,13 @@ import UserContext from "./context/UserContext";
 function App() {
   return (
     <Provider store={store}>
-      {/* Auth first so UserContext can depend on login state */}
-      <AuthContextProvider>
-        <UserContext>
+      <UserContext>
+        <AuthContextProvider>
           <div className="App">
             <AppRoutes />
           </div>
-        </UserContext>
-      </AuthContextProvider>
+        </AuthContextProvider>
+      </UserContext>
     </Provider>
   );
 }

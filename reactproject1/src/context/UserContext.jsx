@@ -10,15 +10,17 @@ function UserContext({ children }) {
   const [cate, setCate] = useState(food_items);
   const [input, setInput] = useState("");
   const [showCart, setShowCart] = useState(false);
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, ready } = useContext(AuthContext);
   const dispatch = useDispatch();
 
   useEffect(() => {
+    if (!ready) return;
+
     if (!isLoggedIn) {
       dispatch(clearCart());
       localStorage.removeItem('cart');
     }
-  }, [isLoggedIn, dispatch]);
+  }, [isLoggedIn, ready, dispatch]);
 
   const data = { cate, setCate, input, setInput, showCart, setShowCart };
   return <dataContext.Provider value={data}>{children}</dataContext.Provider>;

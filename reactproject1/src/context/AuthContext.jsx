@@ -8,13 +8,14 @@ export const AuthContext = createContext({
   isLoggedIn: false,
   userData: null,
   setUserData: () => {},
+  ready: false
 });
 
 export const AuthContextProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true); // ✅ NEW
+  const [ready, setReady] = useState(false);
   const dispatch = useDispatch();
   const tokenKeys = ['token', 'authToken', 'accessToken', 'userJWT'];
 
@@ -28,10 +29,12 @@ export const AuthContextProvider = ({ children }) => {
       }
     }
     if (storedToken) setToken(storedToken);
-    setLoading(false); // ✅ finished checking token
+    setReady(true);
   }, []);
 
   useEffect(() => {
+    if (!ready) return;
+
     const loggedIn = !!token;
     setIsLoggedIn(loggedIn);
 
@@ -62,12 +65,12 @@ export const AuthContextProvider = ({ children }) => {
         } catch {}
       })();
     }
-  }, [token, dispatch]);
+  }, [token, ready, dispatch]);
 
-  if (loading) return null; // ✅ WAIT until token is checked
+  if (!ready) return null;
 
   return (
-    <AuthContext.Provider value={{ token, setToken, isLoggedIn, userData, setUserData }}>
+    <AuthContext.Provider value={{ token, setToken, isLoggedIn, userData, setUserData, ready }}>
       {children}
     </AuthContext.Provider>
   );

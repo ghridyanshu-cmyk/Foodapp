@@ -14,7 +14,6 @@ export const AuthContextProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true); // ✅ NEW
   const dispatch = useDispatch();
   const tokenKeys = ['token', 'authToken', 'accessToken', 'userJWT'];
 
@@ -28,7 +27,6 @@ export const AuthContextProvider = ({ children }) => {
       }
     }
     if (storedToken) setToken(storedToken);
-    setLoading(false); // ✅ finished checking token
   }, []);
 
   useEffect(() => {
@@ -63,8 +61,6 @@ export const AuthContextProvider = ({ children }) => {
       })();
     }
   }, [token, dispatch]);
-
-  if (loading) return null; // ✅ WAIT until token is checked
 
   return (
     <AuthContext.Provider value={{ token, setToken, isLoggedIn, userData, setUserData }}>

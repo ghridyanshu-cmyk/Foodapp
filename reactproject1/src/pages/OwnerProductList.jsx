@@ -75,7 +75,7 @@ const OwnerProductList = () => {
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
                 <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
                 <h1 className="text-xl font-bold text-gray-800">{error || "Please log in to manage products."}</h1>
-                <Link to="/owner-login" className="mt-4 px-6 py-2 bg-emerald-500 text-white rounded-lg">Go to Login</Link>
+                <Link to="/owner/login" className="mt-4 px-6 py-2 bg-emerald-500 text-white rounded-lg">Go to Login</Link>
             </div>
         );
     }

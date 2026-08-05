@@ -42,7 +42,8 @@ const OwnerLogin = () => {
             
             // 3. Finalize login: Save token and update global context
             localStorage.setItem('authToken', userToken);
-            setToken(userToken); // Update AuthContext state
+            localStorage.setItem('userRole', 'owner');
+            setToken(userToken, 'owner'); // Update AuthContext state
             
             // toast removed
             navigate('/owner/profile'); // Navigate directly

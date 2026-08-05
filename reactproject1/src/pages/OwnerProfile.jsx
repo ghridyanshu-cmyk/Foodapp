@@ -141,9 +141,14 @@ const VideoUploadModal = ({ isOpen, onClose, token }) => {
 const fallbackAvatar = "https://placehold.co/100x100/10B981/ffffff?text=O";
 
 const OwnerProfile = () => {
-    const { token, isLoggedIn, userData } = useContext(AuthContext); 
+    const { token, isLoggedIn, userData, logout } = useContext(AuthContext); 
     const navigate = useNavigate();
     const [isUploadOpen, setIsUploadOpen] = useState(false);
+
+    const handleLogout = () => {
+        logout();
+        navigate('/owner/login');
+    };
 
     // Fallbacks for name/email/avatar
     const name = userData?.name || "Admin Dashboard";
@@ -157,7 +162,7 @@ const OwnerProfile = () => {
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
                 <h1 className="text-2xl font-bold text-red-500 mb-4">Access Denied</h1>
                 <p className="text-gray-600 mb-6">You must log in as an Owner to access this panel.</p>
-                <button onClick={() => navigate('/login')} className="px-6 py-2 bg-emerald-500 text-white font-semibold rounded-lg shadow-md hover:bg-emerald-600 transition">Go to Login</button>
+                <button onClick={() => navigate('/owner/login')} className="px-6 py-2 bg-emerald-500 text-white font-semibold rounded-lg shadow-md hover:bg-emerald-600 transition">Go to Login</button>
             </div>
         );
     }
@@ -222,7 +227,7 @@ const OwnerProfile = () => {
                     </Link>
                 </div>
                 <button
-                    onClick={() => navigate('/')}
+                    onClick={handleLogout}
                     className="w-full flex items-center justify-center space-x-3 p-4 text-white rounded-2xl bg-green-500 hover:bg-green-600 shadow transition font-semibold text-lg"
                 >
                     <LogOut className="w-6 h-6" />

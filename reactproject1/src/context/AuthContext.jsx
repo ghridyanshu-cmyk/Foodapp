@@ -3,28 +3,36 @@ import React, { createContext, useState, useEffect } from 'react';
 // 1. Create the Context object
 export const AuthContext = createContext({
     token: null,
+    role: null,
     setToken: () => {},
     isLoggedIn: false,
     userData: null, 
     setUserData: () => {}, 
+    logout: () => {},
 });
 
 // 2. Provider Component
 export const AuthContextProvider = ({ children }) => {
-    // State to hold the token
     const [token, setToken] = useState(null);
+    const [role, setRole] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    // State to hold profile data (name, email, role)
     const [userData, setUserData] = useState(null); 
 
-    // Common keys to check in localStorage for robustness
     const commonTokenKeys = ['token', 'authToken', 'accessToken', 'userJWT'];
 
-    // --- 3. Effect to fetch token from localStorage on mount ---
+    // Logout helper to clear token, role, and user state
+    const logout = () => {
+        commonTokenKeys.forEach(k => localStorage.removeItem(k));
+        localStorage.removeItem('userRole');
+        setToken(null);
+        setRole(null);
+        setUserData(null);
+        setIsLoggedIn(false);
+    };
+
+    // --- 3. Effect to fetch token & role from localStorage on mount ---
     useEffect(() => {
         let storedToken = null;
-        
-        // Loop through common keys to find the active token
         for (const key of commonTokenKeys) {
             const value = localStorage.getItem(key);
             if (value) {
@@ -32,53 +40,102 @@ export const AuthContextProvider = ({ children }) => {
                 break;
             }
         }
+        const storedRole = localStorage.getItem('userRole');
         
-        // If a token is found, set it and mark as logged in
         if (storedToken) {
             setToken(storedToken);
-            // NOTE: Full userData is usually fetched in App.js or a central hook
-            // after the token is set here, to ensure role is also loaded.
+            if (storedRole) setRole(storedRole);
         }
-
     }, []);
 
-    // --- 4. Update login status whenever token state changes ---
+    // --- 4. Update login status & fetch user/owner profile whenever token or role changes ---
     useEffect(() => {
         const loggedIn = !!token;
         setIsLoggedIn(loggedIn);
-        // If logging out, clear user data
+
         if (!loggedIn) {
             setUserData(null);
         } else {
-            // Fetch owner profile from backend if token exists
             (async () => {
-                try {
-                    const res = await fetch(`${import.meta.env.VITE_API_URL}/owner/profile`, {
-                        method: "GET",
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                        },
-                    });
-                    if (res.ok) {
-                        const data = await res.json();
-                        setUserData(data);
-                    } else {
-                        setUserData(null);
+                const currentRole = role || localStorage.getItem('userRole');
+                const baseUrl = import.meta.env.VITE_API_URL;
+
+                const fetchUserProfile = async () => {
+                    try {
+                        const res = await fetch(`${baseUrl}/user/profile`, {
+                            method: 'GET',
+                            headers: { "Authorization": `Bearer ${token}` }
+                        });
+                        if (res.ok) {
+                            const result = await res.json();
+                            const data = result.data?.user || result.data || result;
+                            return { ...data, role: 'user' };
+                        }
+                    } catch (e) {
+                        console.error("User profile fetch error:", e);
                     }
-                } catch (err) {
-                    setUserData(null);
+                    return null;
+                };
+
+                const fetchOwnerProfile = async () => {
+                    try {
+                        const res = await fetch(`${baseUrl}/owner/profile`, {
+                            method: 'GET',
+                            headers: { "Authorization": `Bearer ${token}` }
+                        });
+                        if (res.ok) {
+                            const result = await res.json();
+                            const data = result.data?.owner || result.data || result;
+                            return { ...data, role: 'owner' };
+                        }
+                    } catch (e) {
+                        console.error("Owner profile fetch error:", e);
+                    }
+                    return null;
+                };
+
+                let profile = null;
+                if (currentRole === 'owner') {
+                    profile = await fetchOwnerProfile() || await fetchUserProfile();
+                } else if (currentRole === 'user') {
+                    profile = await fetchUserProfile() || await fetchOwnerProfile();
+                } else {
+                    profile = await fetchUserProfile() || await fetchOwnerProfile();
+                }
+
+                if (profile) {
+                    setUserData(profile);
+                    const detectedRole = profile.role || (currentRole || 'user');
+                    setRole(detectedRole);
+                    localStorage.setItem('userRole', detectedRole);
+                } else {
+                    logout();
                 }
             })();
         }
-    }, [token]);
+    }, [token, role]);
 
-    // 5. Value provided to consuming components
+    const handleSetToken = (newToken, newRole = null) => {
+        if (newToken) {
+            localStorage.setItem('authToken', newToken);
+            if (newRole) {
+                localStorage.setItem('userRole', newRole);
+                setRole(newRole);
+            }
+            setToken(newToken);
+        } else {
+            logout();
+        }
+    };
+
     const contextValue = {
         token,
-        setToken,
+        role,
+        setToken: handleSetToken,
         isLoggedIn,
         userData, 
         setUserData, 
+        logout,
     };
 
     return (

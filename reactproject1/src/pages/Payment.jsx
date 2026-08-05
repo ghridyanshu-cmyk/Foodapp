@@ -139,7 +139,7 @@ const Payment = () => {
             
             <div className="mb-6">
               <label className="block text-gray-600 mb-1">Total Amount</label>
-              <div className="text-3xl font-bold text-gray-800: text-emerald-600">Rs {total}</div>
+              <div className="text-3xl font-bold text-emerald-600">Rs {total}</div>
             </div>
             
             <div className="mb-4">
@@ -159,78 +159,80 @@ const Payment = () => {
 
           {/* Dynamic Payment Form (Right) */}
           <div className="w-full max-w-md mx-auto">
-            
-            {/* Net Banking Form */}
-            {isNetBankingSelected && (
-              <form className="bg-white rounded-xl shadow-2xl p-8 space-y-4" onSubmit={handlePay}>
-                <div className="flex items-center gap-2 mb-6 border-b pb-3">
-                  <span className="text-2xl">🏦</span>
-                  <span className="text-xl font-bold text-emerald-700">Net Banking</span>
+            <form className="bg-white rounded-xl shadow-2xl p-8 space-y-4" onSubmit={handlePay}>
+              {/* Net Banking Form */}
+              {isNetBankingSelected && (
+                <>
+                  <div className="flex items-center gap-2 mb-6 border-b pb-3">
+                    <span className="text-2xl">🏦</span>
+                    <span className="text-xl font-bold text-emerald-700">Net Banking</span>
+                  </div>
+                  <p className="text-sm text-gray-500">You will be redirected to your bank's portal for authentication.</p>
+                  <div>
+                    <label className="block text-gray-700 mb-1">Account Number</label>
+                    <input type="text" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="5100 5422 3211 2544" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-gray-50" required />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-1">Account Holder Name</label>
+                    <input type="text" value={holderName} onChange={(e) => setHolderName(e.target.value)} placeholder="John Doe" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-gray-50" required />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-1">Bank</label>
+                    <input type="text" value={bank} onChange={(e) => setBank(e.target.value)} placeholder="HDFC Bank" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-gray-50" required />
+                  </div>
+                </>
+              )}
+              
+              {/* Cards Form */}
+              {isCardsSelected && (
+                <>
+                  <div className="flex items-center gap-2 mb-6 border-b pb-3">
+                    <span className="text-2xl">💳</span>
+                    <span className="text-xl font-bold text-emerald-700">Card Details</span>
+                  </div>
+                  <p className="text-sm text-gray-500">Secure payment via Razorpay.</p>
+                  <div><label className="block text-gray-700 mb-1">Card Number</label><input type="text" value={cardNo} onChange={(e) => setCardNo(e.target.value)} placeholder="xxxx xxxx xxxx xxxx" className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-50" required /></div>
+                  <div className="flex gap-4">
+                    <div className="w-1/2"><label className="block text-gray-700 mb-1">Expiry (MM/YY)</label><input type="text" value={expiry} onChange={(e) => setExpiry(e.target.value)} placeholder="MM/YY" className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-50" required /></div>
+                    <div className="w-1/2"><label className="block text-gray-700 mb-1">CVV</label><input type="text" value={cvv} onChange={(e) => setCvv(e.target.value)} placeholder="123" className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-50" required /></div>
+                  </div>
+                </>
+              )}
+              
+              {/* UPI Form */}
+              {isUpiSelected && (
+                <>
+                  <div className="flex items-center gap-2 mb-6 border-b pb-3">
+                    <span className="text-2xl">📱</span>
+                    <span className="text-xl font-bold text-emerald-700">UPI/QR Code</span>
+                  </div>
+                  <p className="text-sm text-gray-500">Enter your VPA (Virtual Payment Address).</p>
+                  <div>
+                    <label className="block text-gray-700 mb-1">UPI ID</label>
+                    <input type="text" value={upiId} onChange={(e) => setUpiId(e.target.value)} placeholder="yourupi@bank" className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-50" required />
+                  </div>
+                </>
+              )}
+
+              {/* Paypal / Other */}
+              {!isNetBankingSelected && !isCardsSelected && !isUpiSelected && (
+                <div className="text-center py-4">
+                  <span className="text-4xl">🅿️</span>
+                  <p className="text-gray-700 font-medium mt-2">Paypal Payment</p>
+                  <p className="text-sm text-gray-500">Proceed to authorize payment with Paypal.</p>
                 </div>
-                
-                <p className="text-sm text-gray-500">You will be redirected to your bank's portal for authentication.</p>
-                
-                {/* Form elements for Net Banking (kept simple) */}
-                <div>
-                  <label className="block text-gray-700 mb-1">Account Number</label>
-                  <input type="text" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="5100 5422 3211 2544" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-gray-50" required />
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-1">Account Holder Name</label>
-                  <input type="text" value={holderName} onChange={(e) => setHolderName(e.target.value)} placeholder="John Doe" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-gray-50" required />
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-1">Bank</label>
-                  <input type="text" value={bank} onChange={(e) => setBank(e.target.value)} placeholder="HDFC Bank" className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-gray-50" required />
-                </div>
-              </form>
-            )}
-            
-            {/* Cards Form */}
-            {isCardsSelected && (
-              <form className="bg-white rounded-xl shadow-2xl p-8 space-y-4" onSubmit={handlePay}>
-                <div className="flex items-center gap-2 mb-6 border-b pb-3">
-                  <span className="text-2xl">💳</span>
-                  <span className="text-xl font-bold text-emerald-700">Card Details</span>
-                </div>
-                <p className="text-sm text-gray-500">Secure payment via Razorpay.</p>
-                
-                {/* Simplified Card form fields */}
-                <div><label className="block text-gray-700 mb-1">Card Number</label><input type="text" value={cardNo} onChange={(e) => setCardNo(e.target.value)} placeholder="xxxx xxxx xxxx xxxx" className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-50" required /></div>
-                <div className="flex gap-4">
-                  <div className="w-1/2"><label className="block text-gray-700 mb-1">Expiry (MM/YY)</label><input type="text" value={expiry} onChange={(e) => setExpiry(e.target.value)} placeholder="MM/YY" className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-50" required /></div>
-                  <div className="w-1/2"><label className="block text-gray-700 mb-1">CVV</label><input type="text" value={cvv} onChange={(e) => setCvv(e.target.value)} placeholder="123" className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-50" required /></div>
-                </div>
-              </form>
-            )}
-            
-            {/* UPI Form */}
-             {isUpiSelected && (
-              <form className="bg-white rounded-xl shadow-2xl p-8 space-y-4" onSubmit={handlePay}>
-                <div className="flex items-center gap-2 mb-6 border-b pb-3">
-                  <span className="text-2xl">📱</span>
-                  <span className="text-xl font-bold text-emerald-700">UPI/QR Code</span>
-                </div>
-                <p className="text-sm text-gray-500">Enter your VPA (Virtual Payment Address).</p>
-                
-                <div>
-                  <label className="block text-gray-700 mb-1">UPI ID</label>
-                  <input type="text" value={upiId} onChange={(e) => setUpiId(e.target.value)} placeholder="yourupi@bank" className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-gray-50" required />
-                </div>
-              </form>
-            )}
-            
-            {/* Submit Button (Outside dynamic form for clean handling) */}
-            <div className="mt-6">
+              )}
+              
+              <div className="pt-4">
                 <button
-                    type={isNetBankingSelected || isCardsSelected || isUpiSelected ? "submit" : "button"}
-                    onClick={!isNetBankingSelected && !isCardsSelected && !isUpiSelected ? handlePay : () => {}} // Only call handlePay if a form is NOT selected
-                    disabled={loading}
-                    className={`w-full py-3 rounded-xl shadow-lg text-white font-semibold transition-all text-lg flex items-center justify-center space-x-2 ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full py-3 rounded-xl shadow-lg text-white font-semibold transition-all text-lg flex items-center justify-center space-x-2 ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'}`}
                 >
-                    {loading ? 'Initializing...' : `Pay Rs ${total}`}
+                  {loading ? 'Initializing...' : `Pay Rs ${total}`}
                 </button>
-            </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>

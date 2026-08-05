@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Nav = () => {
     let { input, setInput, cate, setCate, showCart, setShowCart } = useContext(dataContext);
-    const { isLoggedIn } = useContext(AuthContext);
+    const { isLoggedIn, role } = useContext(AuthContext);
     const navigate = useNavigate();
     
     useEffect(() => {
@@ -25,7 +25,11 @@ const Nav = () => {
     
     const handleProfileClick = async() => {
         if (isLoggedIn) {
-            await navigate('/userprofilepage');
+            if (role === 'owner') {
+                await navigate('/owner/profile');
+            } else {
+                await navigate('/userprofilepage');
+            }
         } else {
             await navigate('/dashboard');
         }

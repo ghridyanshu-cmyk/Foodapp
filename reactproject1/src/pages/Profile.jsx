@@ -121,7 +121,7 @@ const defaultUserData = {
 
 const Profile = () => {
     // 🔑 Access context for token/login status and setter function
-    const { token, isLoggedIn, setToken } = useContext(AuthContext);
+    const { token, isLoggedIn, logout } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const [userData, setUserData] = useState(defaultUserData);
@@ -145,8 +145,6 @@ const Profile = () => {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                // 🔑 FIX: Resilient data extraction
-                // Check for 'data.user' (typical ApiResponse structure) or direct data.
                 const rawData = response.data.data || response.data;
                 const data = rawData.user || rawData;
 
@@ -167,22 +165,15 @@ const Profile = () => {
             }
         };
         fetchProfile();
-    }, [isLoggedIn, token, navigate]); // Added navigate to dependency array
+    }, [isLoggedIn, token, navigate]);
 
-    // 2. Handle Logout (Redirects to /login and clears state)
+    // 2. Handle Logout (Redirects to / and clears state)
     const handleLogout = (showToast = true) => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('authToken');
-
-        // Use setToken from context to globally update login status
-        if (typeof setToken === 'function') {
-            setToken(null);
-        }
-
+        logout();
         if (showToast) {
             toast.success("Logged out successfully!");
         }
-        navigate('/'); // Standard secure practice: redirect to login page
+        navigate('/');
     };
 
     // 3. Handle Profile Save (Edit Modal Submission)

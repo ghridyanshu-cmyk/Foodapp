@@ -99,13 +99,19 @@ const logoutOwner = asyncHandler(async (req, res) => {
 const getOwnerProfile = asyncHandler(async (req, res) => {
     const ownerId = req.user?._id || req.owner?._id;
     if (!ownerId) {
-        return res.status(401).json({ message: "Unauthorized" });
+        throw new ApiError(401, "Unauthorized");
     }
-    const owner = await Owner.findById(ownerId).select("name email avatarUrl");
+    const owner = await Owner.findById(ownerId).select("-password -refreshToken");
     if (!owner) {
-        return res.status(404).json({ message: "Owner not found" });
+        throw new ApiError(404, "Owner not found");
     }
-    res.status(200).json({ name: owner.name, email: owner.email, avatarUrl: owner.avatarUrl || null });
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            { _id: owner._id, name: owner.name, email: owner.email, avatarUrl: owner.avatarUrl || null, role: "owner" },
+            "Owner profile retrieved successfully"
+        )
+    );
 });
 
 export { registerOwner, loginOwner, logoutOwner, getOwnerProfile };

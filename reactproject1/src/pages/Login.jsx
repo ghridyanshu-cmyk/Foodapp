@@ -34,7 +34,8 @@ const Login = () => {
             }
 
             localStorage.setItem('authToken', userToken);
-            setToken(userToken);
+            localStorage.setItem('userRole', 'user');
+            setToken(userToken, 'user');
             navigate('/userprofilepage');
 
         } catch (err) {

@@ -1,7 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 
 const AddProduct = () => {
+    const { token } = useContext(AuthContext);
     const [productData, setProductData] = useState({
         name: '',
         price: '',
@@ -56,10 +58,17 @@ const AddProduct = () => {
         }
 
         try {
+            const authToken = token || localStorage.getItem('authToken');
             const response = await axios.post(
                 `${import.meta.env.VITE_API_URL}/product/addproduct`,
                 formData,
-                { withCredentials: true, headers: { "Content-Type": "multipart/form-data" } }
+                { 
+                    withCredentials: true, 
+                    headers: { 
+                        "Content-Type": "multipart/form-data",
+                        "Authorization": `Bearer ${authToken}`
+                    } 
+                }
             );
             console.log('Success:', response.data);
             alert('Product added successfully!');

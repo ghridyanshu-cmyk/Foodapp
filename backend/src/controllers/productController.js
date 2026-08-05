@@ -19,12 +19,15 @@ const addProduct = async (req, res) => {
             return res.status(400).json({ message: "Category is required." });
         }
         const imageUrl = req.files?.image?.[0]?.path;
-        const image = await uploadOnCloudinary(imageUrl);
+        let image = null;
+        if (imageUrl) {
+            image = await uploadOnCloudinary(imageUrl);
+        }
         const product = await Product.create({
             name,
             id,
             price,
-            image: image.url,
+            image: image?.url || "https://placehold.co/300x300/10B981/ffffff?text=Product",
             qty,
             type,
             category,

@@ -15,11 +15,8 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
-            callback(null, true);
-        } else {
-            callback(null, true);
-        }
+        // Allow requests from all origins (localhost, Vercel, Render, mobile, etc.)
+        callback(null, true);
     },
     credentials: true,
 }));

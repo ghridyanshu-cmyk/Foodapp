@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-
-import { Lock, User } from 'lucide-react'; // Added Lock icon
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight, Store, ShieldCheck } from 'lucide-react';
 
 const OwnerRegister = () => {
     const navigate = useNavigate();
@@ -19,24 +18,21 @@ const OwnerRegister = () => {
         setMessage('');
 
         try {
-            // CRITICAL: Connect to your standard registration endpoint but include the role
-            const response = await axios.post(`${import.meta.env.VITE_API_URL}/owner/register`, {
+            await axios.post(`${import.meta.env.VITE_API_URL}/owner/register`, {
                 name,
                 email,
                 password,
-                role: 'owner' // Assign the privileged role
+                role: 'owner'
             });
 
-            setMessage("Registration successful! You may now log in.");
-            // toast removed
-            
-            // Redirect to the Owner Login page after successful registration
-            navigate('/owner/login');
+            setMessage("Registration successful! Redirecting to login...");
+            setTimeout(() => {
+                navigate('/owner/login');
+            }, 1000);
 
         } catch (error) {
             const errorMessage = error.response?.data?.message || "Registration failed. Check server status.";
             setMessage(errorMessage);
-            // toast removed
             console.error("Registration Error:", error);
         } finally {
             setLoading(false);
@@ -44,87 +40,101 @@ const OwnerRegister = () => {
     };
 
     return (
-        // Preserve original gradient styling
-        <div className="flex min-h-screen bg-gradient-to-r from-gray-200 to-green-500">
-            <div className="flex flex-1 items-center justify-center">
-                <div className="bg-white/80 rounded-3xl shadow-2xl p-8 w-full max-w-md mx-4">
-                    <div className="flex justify-center mb-6">
-                        <div className="w-12 h-12 bg-black rounded flex items-center justify-center">
-                            <span className="text-white text-2xl font-bold">A</span>
+        <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+            <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="w-full max-w-md bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl relative z-10 space-y-6">
+                
+                <div className="flex flex-col items-center text-center space-y-3">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-600 to-emerald-400 p-[2px] shadow-lg shadow-teal-500/20">
+                        <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                            <Store className="w-7 h-7 text-teal-400" />
                         </div>
                     </div>
-                    <h2 className="text-2xl font-bold text-center mb-6">Food Owner Register</h2>
-                    
-                    {message && (
-                        <div className={`p-3 rounded-lg text-sm mb-4 ${message.includes('successful') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                            {message}
+                    <h1 className="text-2xl font-extrabold text-white tracking-tight">Owner Registration</h1>
+                    <p className="text-xs text-slate-400">Create your Food Owner Account</p>
+                </div>
+
+                {message && (
+                    <div className={`p-3.5 rounded-2xl border text-xs font-semibold flex items-center gap-2 ${
+                        message.includes('successful')
+                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                            : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                    }`}>
+                        <ShieldCheck className="w-4 h-4 flex-shrink-0" />
+                        <span>{message}</span>
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-300">Restaurant / Owner Name</label>
+                        <div className="relative flex items-center">
+                            <User className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                            <input
+                                type="text"
+                                placeholder="Gourmet Kitchen"
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                                required
+                                className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-500 text-sm rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
+                            />
                         </div>
-                    )}
-                    
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Name Input */}
-                        <input
-                            type="text"
-                            placeholder="Name"
-                            value={name}
-                            onChange={e => setName(e.target.value)}
-                            required
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-100"
-                        />
-                        {/* Email Input */}
-                        <input
-                            type="email"
-                            placeholder="Email address"
-                            value={email}
-                            onChange={e => setEmail(e.target.value)}
-                            required
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-100"
-                        />
-                        {/* Password Input */}
-                        <div className="relative">
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-300">Email Address</label>
+                        <div className="relative flex items-center">
+                            <Mail className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                            <input
+                                type="email"
+                                placeholder="owner@restaurant.com"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                required
+                                className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-500 text-sm rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold text-slate-300">Password</label>
+                        <div className="relative flex items-center">
+                            <Lock className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
                             <input
                                 type={showPassword ? "text" : "password"}
-                                placeholder="Password"
+                                placeholder="••••••••"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
                                 required
-                                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-100"
+                                className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-500 text-sm rounded-xl pl-10 pr-10 py-3 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
                             />
-                            <span
-                                className="absolute right-3 top-2 cursor-pointer text-gray-500"
+                            <button
+                                type="button"
+                                className="absolute right-3 text-slate-400 hover:text-slate-200"
                                 onClick={() => setShowPassword(!showPassword)}
                             >
-                                {showPassword ? '🙈' : '👁️'}
-                            </span>
+                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
                         </div>
-                        
-                        <div className="flex justify-between text-sm mb-2">
-                             <Link to="/owner/login" className="text-green-600 hover:underline">Login in</Link>
-                        </div>
-                        
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className={`w-full py-2 rounded-lg text-white font-semibold transition-all ${loading ? 'bg-gray-400' : 'bg-green-500 hover:bg-green-600'}`}
-                        >
-                            {loading ? 'Signing Up...' : 'Sign up'}
-                        </button>
-                    </form>
-                    
-                    <div className="flex justify-center gap-4 mt-6">
-                        <button className="bg-white border rounded-full p-2 shadow hover:bg-gray-100"><span className="text-xl">G</span></button>
-                        <button className="bg-white border rounded-full p-2 shadow hover:bg-gray-100"><span className="text-xl">F</span></button>
                     </div>
+
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className={`w-full py-3.5 px-4 bg-gradient-to-r from-teal-600 to-emerald-500 hover:from-teal-500 hover:to-emerald-400 active:scale-98 text-white font-bold rounded-xl shadow-lg shadow-teal-600/25 flex items-center justify-center gap-2 transition-all cursor-pointer text-sm ${loading ? 'opacity-60 cursor-wait' : ''}`}
+                    >
+                        <span>{loading ? 'Creating Account...' : 'Register Account'}</span>
+                        <ArrowRight className="w-4 h-4" />
+                    </button>
+                </form>
+
+                <div className="pt-2 border-t border-slate-800 flex flex-col items-center gap-2 text-xs">
+                    <Link to="/owner/login" className="text-teal-400 font-bold hover:underline">
+                        Already registered? Log in here →
+                    </Link>
                 </div>
-            </div>
-            {/* Simple visual graphic for desktop view */}
-            <div className="hidden md:flex flex-1 items-center justify-center">
-                 <svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="50" y="80" width="180" height="60" rx="10" fill="#222" />
-                    <rect x="70" y="60" width="140" height="40" rx="8" fill="#222" />
-                    <circle cx="70" cy="150" r="15" fill="#222" />
-                    <circle cx="210" cy="150" r="15" fill="#222" />
-                 </svg>
+
             </div>
         </div>
     );

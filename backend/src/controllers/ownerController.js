@@ -29,12 +29,13 @@ const registerOwner = asyncHandler(async (req, res) => {
     if ([name, email, password].some((field) => !field || field.trim() === "")) {
         return res.status(400).json({ message: "All fields are required" });
     }
-    const existingOwner = await Owner.findOne({ email });
+    const cleanEmail = email.toLowerCase().trim();
+    const existingOwner = await Owner.findOne({ email: cleanEmail });
 
     if (existingOwner) {
-        return res.status(400).json({ message: "Owner already exists" });
+        return res.status(400).json({ message: "Owner already exists with this email" });
     }
-    const owner = await Owner.create({ name, email, password });
+    const owner = await Owner.create({ name: name.trim(), email: cleanEmail, password });
 
     const createdOwner = await Owner.findById(owner._id).select("-password -refreshToken");
 
@@ -50,8 +51,9 @@ const loginOwner = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "All fields are required" });
     }
 
-    const owner = await Owner.findOne({ email });
-    if (!owner) throw new ApiError(404, "Owner not found");
+    const cleanEmail = email.toLowerCase().trim();
+    const owner = await Owner.findOne({ email: cleanEmail });
+    if (!owner) throw new ApiError(404, "Owner account not found. Check email or register first.");
 
     const isPasswordValid = await owner.isPasswordCorrect(password);
     if (!isPasswordValid) throw new ApiError(400, "Email or password is incorrect");
@@ -72,7 +74,7 @@ const loginOwner = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                { owner: loggedInOwner, accessToken, refreshToken },
+                { owner: loggedInOwner, accessToken, refreshToken, role: "owner" },
                 "Owner logged in successfully"
             )
         );

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { MdAutoDelete } from "react-icons/md";
+import { Trash2, Plus, Minus } from "lucide-react";
 import { useDispatch } from 'react-redux';
 import { DecreamentQty, IncreamentQty, RemoveItem } from '../redux/cartSlice';
 import axios from 'axios';
@@ -10,7 +10,7 @@ const Card2 = ({ name, id, price, image, qty }) => {
     const { token } = useContext(AuthContext);
 
     const updateBackendCart = async (qtyDiff) => {
-        if (!token) return false;
+        if (!token) return true; // Local update if guest
         try {
             await axios.post(`${import.meta.env.VITE_API_URL}/cart/add`, {
                 productId: id,
@@ -45,54 +45,77 @@ const Card2 = ({ name, id, price, image, qty }) => {
     };
 
     const handleRemoveItem = async () => {
-        if (!token) return;
-
-        try {
-            await axios.delete(`${import.meta.env.VITE_API_URL}/cart/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            dispatch(RemoveItem(id));
-
-            const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const updatedCart = localCart.filter(item => item.id !== id);
-            localStorage.setItem('cart', JSON.stringify(updatedCart));
-        } catch (err) {
-            console.error("Remove failed:", err);
+        if (token) {
+            try {
+                await axios.delete(`${import.meta.env.VITE_API_URL}/cart/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            } catch (err) {
+                console.error("Remove failed on server:", err);
+            }
         }
+
+        dispatch(RemoveItem(id));
+
+        const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const updatedCart = localCart.filter(item => item.id !== id);
+        localStorage.setItem('cart', JSON.stringify(updatedCart));
     };
 
     return (
-        <div className='w-full h-[120px] p-2 shadow-lg flex justify-between'>
-            <div className='w-[70%] h-full flex gap-5'>
-                <div className='w-[60%] h-full overflow-hidden rounded-lg'>
-                    <img src={image} alt={name} className='object-cover' />
+        <div className="w-full bg-slate-800/80 backdrop-blur-md rounded-2xl p-3.5 flex items-center justify-between border border-slate-700/60 shadow-lg hover:border-slate-600 transition-all gap-3">
+            
+            {/* Left Section: Thumbnail & Title */}
+            <div className="flex items-center gap-3.5 flex-1 min-w-0">
+                <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-900 flex-shrink-0 border border-slate-700/50">
+                    <img 
+                        src={image || "https://placehold.co/100x100/10B981/ffffff?text=Food"} 
+                        alt={name} 
+                        className="w-full h-full object-cover" 
+                        onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/100x100/10B981/ffffff?text=Food"; }}
+                    />
                 </div>
-                <div className='w-[40%] h-full flex flex-col gap-3'>
-                    <div className='text-lg text-gray-500 font-semibold'>{name}</div>
-                    <div className='w-[110px] h-[50px] bg-slate-400 flex rounded-lg overflow-hidden shadow-lg font-semibold border-2 border-green-400 text-xl'>
-                        <button
-                            className='w-[30%] h-full bg-white flex justify-center items-center text-green-400 hover:bg-gray-200'
-                            onClick={() => handleQuantityChange('decrement')}
-                        >
-                            -
-                        </button>
-                        <span className='w-[40%] h-full bg-slate-200 flex justify-center items-center text-green-400'>{qty}</span>
-                        <button
-                            className='w-[30%] h-full text-green-400 bg-white flex justify-center items-center hover:bg-gray-200'
-                            onClick={() => handleQuantityChange('increment')}
-                        >
-                            +
-                        </button>
-                    </div>
+                
+                <div className="flex flex-col min-w-0">
+                    <h4 className="text-sm font-bold text-slate-100 line-clamp-1 truncate">
+                        {name}
+                    </h4>
+                    <span className="text-xs font-semibold text-emerald-400 mt-0.5">
+                        Rs {price}
+                    </span>
                 </div>
             </div>
-            <div className='flex flex-col justify-start items-end gap-6'>
-                <span className='text-xl text-green-400 font-semibold'>Rs {price}/-</span>
-                <MdAutoDelete
-                    className='w-[30px] h-[30px] text-red-400 cursor-pointer'
+
+            {/* Right Section: Stepper & Remove */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+                {/* Stepper Control */}
+                <div className="flex items-center bg-slate-900/90 rounded-xl p-1 border border-slate-700/70">
+                    <button
+                        className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 flex items-center justify-center transition-all disabled:opacity-40"
+                        onClick={() => handleQuantityChange('decrement')}
+                        disabled={qty <= 1}
+                    >
+                        <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="w-8 text-center text-xs font-extrabold text-emerald-400">
+                        {qty}
+                    </span>
+                    <button
+                        className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 flex items-center justify-center transition-all"
+                        onClick={() => handleQuantityChange('increment')}
+                    >
+                        <Plus className="w-3.5 h-3.5" />
+                    </button>
+                </div>
+
+                {/* Trash Button */}
+                <button
+                    className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
                     onClick={handleRemoveItem}
-                />
+                    title="Remove item"
+                >
+                    <Trash2 className="w-4 h-4" />
+                </button>
             </div>
         </div>
     );

@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, MapPin, LogOut, Home, Gamepad, Edit, ChevronRight, X, Camera, Save, ShoppingBag } from 'lucide-react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setCartItems } from '../redux/cartSlice';
 
 // --- Edit Profile Modal Component ---
 
@@ -167,8 +169,12 @@ const Profile = () => {
         fetchProfile();
     }, [isLoggedIn, token, navigate]);
 
+    const dispatch = useDispatch();
+
     // 2. Handle Logout (Redirects to / and clears state)
     const handleLogout = (showToast = true) => {
+        dispatch(setCartItems([]));
+        localStorage.removeItem('cart');
         logout();
         if (showToast) {
             toast.success("Logged out successfully!");

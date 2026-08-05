@@ -10,7 +10,7 @@ const Card2 = ({ name, id, price, image, qty }) => {
     const { token } = useContext(AuthContext);
 
     const updateBackendCart = async (qtyDiff) => {
-        if (!token) return true; // Local update if guest
+        if (!token) return true;
         try {
             await axios.post(`${import.meta.env.VITE_API_URL}/cart/add`, {
                 productId: id,
@@ -32,8 +32,7 @@ const Card2 = ({ name, id, price, image, qty }) => {
         else return;
 
         const qtyDiff = newQty - qty;
-        const success = await updateBackendCart(qtyDiff);
-        if (!success) return;
+        await updateBackendCart(qtyDiff);
 
         if (actionType === 'increment') dispatch(IncreamentQty(id));
         else if (actionType === 'decrement') dispatch(DecreamentQty(id));
@@ -63,56 +62,54 @@ const Card2 = ({ name, id, price, image, qty }) => {
     };
 
     return (
-        <div className="w-full bg-slate-800/80 backdrop-blur-md rounded-2xl p-3.5 flex items-center justify-between border border-slate-700/60 shadow-lg hover:border-slate-600 transition-all gap-3">
+        <div className="w-full bg-white rounded-xl p-3 flex items-center justify-between border border-gray-200 shadow-sm hover:shadow-md transition-all gap-3">
             
-            {/* Left Section: Thumbnail & Title */}
-            <div className="flex items-center gap-3.5 flex-1 min-w-0">
-                <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-900 flex-shrink-0 border border-slate-700/50">
+            {/* Left Thumbnail & Info */}
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
                     <img 
-                        src={image || "https://placehold.co/100x100/10B981/ffffff?text=Food"} 
+                        src={image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60"} 
                         alt={name} 
                         className="w-full h-full object-cover" 
-                        onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/100x100/10B981/ffffff?text=Food"; }}
+                        onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60"; }}
                     />
                 </div>
                 
                 <div className="flex flex-col min-w-0">
-                    <h4 className="text-sm font-bold text-slate-100 line-clamp-1 truncate">
+                    <h4 className="text-sm font-bold text-gray-800 line-clamp-1">
                         {name}
                     </h4>
-                    <span className="text-xs font-semibold text-emerald-400 mt-0.5">
+                    <span className="text-xs font-semibold text-emerald-600 mt-0.5">
                         Rs {price}
                     </span>
                 </div>
             </div>
 
-            {/* Right Section: Stepper & Remove */}
-            <div className="flex items-center gap-3 flex-shrink-0">
-                {/* Stepper Control */}
-                <div className="flex items-center bg-slate-900/90 rounded-xl p-1 border border-slate-700/70">
+            {/* Right Stepper & Delete */}
+            <div className="flex items-center gap-2.5 flex-shrink-0">
+                <div className="flex items-center bg-gray-100 rounded-lg p-1 border border-gray-200">
                     <button
-                        className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 flex items-center justify-center transition-all disabled:opacity-40"
+                        className="w-6 h-6 rounded bg-white hover:bg-gray-200 active:scale-95 text-gray-700 flex items-center justify-center transition disabled:opacity-40"
                         onClick={() => handleQuantityChange('decrement')}
                         disabled={qty <= 1}
                     >
-                        <Minus className="w-3.5 h-3.5" />
+                        <Minus className="w-3 h-3" />
                     </button>
-                    <span className="w-8 text-center text-xs font-extrabold text-emerald-400">
+                    <span className="w-7 text-center text-xs font-bold text-gray-800">
                         {qty}
                     </span>
                     <button
-                        className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-300 flex items-center justify-center transition-all"
+                        className="w-6 h-6 rounded bg-white hover:bg-gray-200 active:scale-95 text-gray-700 flex items-center justify-center transition"
                         onClick={() => handleQuantityChange('increment')}
                     >
-                        <Plus className="w-3.5 h-3.5" />
+                        <Plus className="w-3 h-3" />
                     </button>
                 </div>
 
-                {/* Trash Button */}
                 <button
-                    className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition"
                     onClick={handleRemoveItem}
-                    title="Remove item"
+                    title="Remove"
                 >
                     <Trash2 className="w-4 h-4" />
                 </button>

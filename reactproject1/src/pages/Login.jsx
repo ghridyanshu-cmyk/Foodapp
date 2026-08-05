@@ -37,10 +37,11 @@ const Login = () => {
             localStorage.setItem('authToken', userToken);
             localStorage.setItem('userRole', 'user');
             setToken(userToken, 'user');
-            navigate('/userprofilepage');
+            navigate('/');
 
         } catch (err) {
-            setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
+            const serverMsg = err.response?.data?.message || err.response?.data?.error || 'Login failed. Invalid email or password.';
+            setError(serverMsg);
             console.error("Login Error:", err);
         } finally {
             setLoading(false);

@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 // FIX: Added ChevronRight to the import list
 import { User, Video, LogOut, Upload, X, Save, File, Clock, ShoppingBag, ChevronRight } from 'lucide-react'; 
 
-import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setCartItems } from '../redux/cartSlice';
 
 // --- Owner/Admin Upload Modal Component ---
 
@@ -145,7 +146,11 @@ const OwnerProfile = () => {
     const navigate = useNavigate();
     const [isUploadOpen, setIsUploadOpen] = useState(false);
 
+    const dispatch = useDispatch();
+
     const handleLogout = () => {
+        dispatch(setCartItems([]));
+        localStorage.removeItem('cart');
         logout();
         navigate('/owner/login');
     };

@@ -40,7 +40,8 @@ const OwnerLogin = () => {
             navigate('/owner/profile');
 
         } catch (error) {
-            setMessage(error.response?.data?.message || "Login failed. Please check credentials.");
+            const serverMsg = error.response?.data?.message || error.response?.data?.error || "Login failed. Invalid owner email or password.";
+            setMessage(serverMsg);
             console.error("Owner Login Error:", error);
         } finally {
             setLoading(false);

@@ -1,4 +1,5 @@
 import { Video } from '../models/video.models.js';
+import { Owner } from '../models/owner.models.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
@@ -54,6 +55,8 @@ const getFeedVideos = asyncHandler(async (req, res) => {
         .sort({ createdAt: -1 })
         .populate('owner', 'name avatarUrl')
         .select('-__v');
+
+    console.log("getFeedVideos fetched count:", videos.length);
 
     res.status(200).json(
         new ApiResponse(200, videos, "Video feed retrieved successfully.")

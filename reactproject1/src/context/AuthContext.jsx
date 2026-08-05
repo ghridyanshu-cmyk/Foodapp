@@ -20,10 +20,11 @@ export const AuthContextProvider = ({ children }) => {
 
     const commonTokenKeys = ['token', 'authToken', 'accessToken', 'userJWT'];
 
-    // Logout helper to clear token, role, and user state
+    // Logout helper to clear token, role, user state, and cart
     const logout = () => {
         commonTokenKeys.forEach(k => localStorage.removeItem(k));
         localStorage.removeItem('userRole');
+        localStorage.removeItem('cart');
         setToken(null);
         setRole(null);
         setUserData(null);
@@ -72,7 +73,7 @@ export const AuthContextProvider = ({ children }) => {
                             return { ...data, role: 'user' };
                         }
                     } catch (e) {
-                        console.error("User profile fetch error:", e);
+                        // Ignore
                     }
                     return null;
                 };
@@ -89,18 +90,21 @@ export const AuthContextProvider = ({ children }) => {
                             return { ...data, role: 'owner' };
                         }
                     } catch (e) {
-                        console.error("Owner profile fetch error:", e);
+                        // Ignore
                     }
                     return null;
                 };
 
                 let profile = null;
                 if (currentRole === 'owner') {
-                    profile = await fetchOwnerProfile() || await fetchUserProfile();
+                    profile = await fetchOwnerProfile();
+                    if (!profile) profile = await fetchUserProfile();
                 } else if (currentRole === 'user') {
-                    profile = await fetchUserProfile() || await fetchOwnerProfile();
+                    profile = await fetchUserProfile();
+                    if (!profile) profile = await fetchOwnerProfile();
                 } else {
-                    profile = await fetchUserProfile() || await fetchOwnerProfile();
+                    profile = await fetchUserProfile();
+                    if (!profile) profile = await fetchOwnerProfile();
                 }
 
                 if (profile) {
@@ -109,6 +113,7 @@ export const AuthContextProvider = ({ children }) => {
                     setRole(detectedRole);
                     localStorage.setItem('userRole', detectedRole);
                 } else {
+                    // Token is invalid for both User and Owner - clear state
                     logout();
                 }
             })();

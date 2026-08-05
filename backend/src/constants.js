@@ -1,1 +1,1 @@
-export const DB_NAME = "food-app";
+export const DB_NAME = "test";

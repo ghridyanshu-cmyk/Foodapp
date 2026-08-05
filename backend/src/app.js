@@ -1,6 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import './models/owner.models.js';
+import './models/video.models.js';
+import './models/user.models.js';
+import './models/product.models.js';
 
 
 const app = express();

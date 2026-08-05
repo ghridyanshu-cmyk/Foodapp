@@ -170,9 +170,9 @@ const Home = () => {
             {/* Food Grid */}
             <main className="px-4 sm:px-8 py-6 max-w-7xl mx-auto w-full flex-grow">
                 {loadingProducts ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 w-full">
                         {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
-                            <div key={n} className="w-[270px] sm:w-[290px] h-[380px] bg-white rounded-2xl p-4 border border-gray-200 animate-pulse flex flex-col justify-between">
+                            <div key={n} className="w-full h-[360px] bg-white rounded-2xl p-4 border border-gray-200 animate-pulse flex flex-col justify-between">
                                 <div className="w-full h-[58%] bg-gray-200 rounded-xl"></div>
                                 <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                                 <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -181,7 +181,7 @@ const Home = () => {
                         ))}
                     </div>
                 ) : filteredProducts.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 w-full">
                         {filteredProducts.map(item => (
                             <Card
                                 key={item._id || item.id}

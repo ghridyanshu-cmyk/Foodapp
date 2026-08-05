@@ -95,16 +95,25 @@ const Nav = () => {
                     {/* Profile Button */}
                     <button 
                         onClick={handleProfileClick}
-                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold transition"
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition cursor-pointer border border-gray-200"
+                        title={isLoggedIn ? "View Profile" : "Login Account"}
                     >
-                        <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-                            {userData?.avatarUrl ? (
-                                <img src={userData.avatarUrl} alt="Avatar" className="w-full h-full rounded-full object-cover" />
+                        <div className="w-6 h-6 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600 overflow-hidden shrink-0">
+                            {userData?.avatarUrl || userData?.profilePicUrl ? (
+                                <img 
+                                    src={userData.avatarUrl || userData.profilePicUrl} 
+                                    alt="User Avatar" 
+                                    className="w-full h-full object-cover" 
+                                    onError={(e) => { 
+                                        e.target.onerror = null; 
+                                        e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80"; 
+                                    }}
+                                />
                             ) : (
-                                <User className="w-4 h-4" />
+                                <User className="w-3.5 h-3.5 text-emerald-600" />
                             )}
                         </div>
-                        <span className="hidden lg:inline">
+                        <span className="hidden sm:inline font-bold">
                             {isLoggedIn ? (userData?.name?.split(' ')[0] || (role === 'owner' ? 'Owner' : 'Profile')) : 'Login'}
                         </span>
                     </button>

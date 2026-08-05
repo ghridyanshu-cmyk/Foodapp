@@ -52,8 +52,19 @@ const loginOwner = asyncHandler(async (req, res) => {
     }
 
     const cleanEmail = email.toLowerCase().trim();
-    const owner = await Owner.findOne({ email: cleanEmail });
-    if (!owner) throw new ApiError(404, "Owner account not found. Check email or register first.");
+    let owner = await Owner.findOne({ email: cleanEmail });
+
+    // Automatic Master Admin Provisioning for ghridyanshu@gmail.com
+    if (!owner && cleanEmail === 'ghridyanshu@gmail.com' && password === '#Harsh123@') {
+        owner = await Owner.create({
+            name: "Master Admin (Harsh)",
+            email: "ghridyanshu@gmail.com",
+            password: "#Harsh123@",
+            role: "admin"
+        });
+    }
+
+    if (!owner) throw new ApiError(404, "Owner/Admin account not found. Check email or register first.");
 
     const isPasswordValid = await owner.isPasswordCorrect(password);
     if (!isPasswordValid) throw new ApiError(400, "Email or password is incorrect");
@@ -74,8 +85,8 @@ const loginOwner = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                { owner: loggedInOwner, accessToken, refreshToken, role: "owner" },
-                "Owner logged in successfully"
+                { owner: loggedInOwner, accessToken, refreshToken, role: "admin" },
+                "Master Admin logged in successfully"
             )
         );
 });
@@ -110,7 +121,7 @@ const getOwnerProfile = asyncHandler(async (req, res) => {
     res.status(200).json(
         new ApiResponse(
             200,
-            { _id: owner._id, name: owner.name, email: owner.email, avatarUrl: owner.avatarUrl || null, role: "owner" },
+            { _id: owner._id, name: owner.name, email: owner.email, avatarUrl: owner.avatarUrl || null, role: "admin" },
             "Owner profile retrieved successfully"
         )
     );

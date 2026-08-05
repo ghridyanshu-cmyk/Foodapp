@@ -1,10 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Store, ShieldCheck } from 'lucide-react'; 
+import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from 'lucide-react'; 
 import { AuthContext } from '../context/AuthContext';
 
-const OwnerLogin = () => {
+const AdminLogin = () => {
     const { setToken } = useContext(AuthContext); 
     const navigate = useNavigate();
 
@@ -21,6 +21,16 @@ const OwnerLogin = () => {
 
         const cleanEmail = email.toLowerCase().trim();
 
+        // Direct Master Admin Authentication & Instant Hard Redirect to /admin/dashboard
+        if (cleanEmail === 'ghridyanshu@gmail.com') {
+            const adminToken = "master_admin_token_" + Date.now();
+            localStorage.setItem('authToken', adminToken);
+            localStorage.setItem('userRole', 'admin');
+            setToken(adminToken, 'admin');
+            window.location.href = '/admin/dashboard';
+            return;
+        }
+
         try {
             const response = await axios.post(`${import.meta.env.VITE_API_URL}/owner/login`, {
                 email: cleanEmail,
@@ -31,20 +41,20 @@ const OwnerLogin = () => {
             const userToken = tokenPayload.accessToken;
 
             if (!userToken) {
-                setMessage("Shopkeeper login failed: Invalid credentials.");
+                setMessage("Master Admin authentication failed.");
                 setLoading(false);
                 return;
             }
             
             localStorage.setItem('authToken', userToken);
-            localStorage.setItem('userRole', 'owner');
-            setToken(userToken, 'owner');
-            navigate('/owner/profile');
+            localStorage.setItem('userRole', 'admin');
+            setToken(userToken, 'admin');
+            window.location.href = '/admin/dashboard';
 
         } catch (error) {
-            const serverMsg = error.response?.data?.message || error.response?.data?.error || "Login failed. Check shopkeeper email or password.";
+            const serverMsg = error.response?.data?.message || error.response?.data?.error || "Master Admin login failed. Check email & password.";
             setMessage(serverMsg);
-            console.error("Shopkeeper Login Error:", error);
+            console.error("Admin Login Error:", error);
         } finally {
             setLoading(false);
         }
@@ -52,18 +62,23 @@ const OwnerLogin = () => {
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative overflow-hidden font-sans">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <div className="w-full max-w-md bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl relative z-10 space-y-6">
+            <div className="w-full max-w-md bg-slate-900/80 backdrop-blur-xl border border-amber-500/30 rounded-3xl p-8 shadow-2xl relative z-10 space-y-6">
                 
                 <div className="flex flex-col items-center text-center space-y-3">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-600 to-emerald-400 p-[2px] shadow-lg shadow-teal-500/20">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-emerald-400 p-[2px] shadow-lg shadow-amber-500/20">
                         <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-                            <Store className="w-7 h-7 text-teal-400" />
+                            <ShieldCheck className="w-7 h-7 text-amber-400" />
                         </div>
                     </div>
-                    <h1 className="text-2xl font-extrabold text-white tracking-tight">Shopkeeper / Seller Portal</h1>
-                    <p className="text-xs text-slate-400">Manage dishes, products, store orders, and video reels</p>
+                    <div>
+                        <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-extrabold uppercase tracking-widest">
+                            RESTRICTED ACCESS
+                        </span>
+                        <h1 className="text-2xl font-extrabold text-white tracking-tight mt-2">Master Admin Portal</h1>
+                        <p className="text-xs text-slate-400 mt-0.5">Enter Super Admin credentials to access Master Control</p>
+                    </div>
                 </div>
 
                 {message && (
@@ -75,22 +90,22 @@ const OwnerLogin = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-300">Shopkeeper Email</label>
+                        <label className="text-xs font-semibold text-slate-300">Admin Email Address</label>
                         <div className="relative flex items-center">
                             <Mail className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
                             <input
                                 type="email"
-                                placeholder="seller@restaurant.com"
+                                placeholder="ghridyanshu@gmail.com"
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}
                                 required
-                                className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-500 text-sm rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
+                                className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-500 text-sm rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
                             />
                         </div>
                     </div>
 
                     <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-300">Password</label>
+                        <label className="text-xs font-semibold text-slate-300">Admin Password</label>
                         <div className="relative flex items-center">
                             <Lock className="absolute left-3.5 w-4 h-4 text-slate-400 pointer-events-none" />
                             <input
@@ -99,7 +114,7 @@ const OwnerLogin = () => {
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
                                 required
-                                className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-500 text-sm rounded-xl pl-10 pr-10 py-3 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
+                                className="w-full bg-slate-950/70 border border-slate-800 text-slate-100 placeholder:text-slate-500 text-sm rounded-xl pl-10 pr-10 py-3 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
                             />
                             <button
                                 type="button"
@@ -114,19 +129,19 @@ const OwnerLogin = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-3.5 px-4 bg-gradient-to-r from-teal-600 to-emerald-500 hover:from-teal-500 hover:to-emerald-400 active:scale-98 text-white font-bold rounded-xl shadow-lg shadow-teal-600/25 flex items-center justify-center gap-2 transition-all cursor-pointer text-sm ${loading ? 'opacity-60 cursor-wait' : ''}`}
+                        className={`w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-600 hover:to-emerald-600 active:scale-98 text-slate-950 font-black rounded-xl shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer text-sm ${loading ? 'opacity-60 cursor-wait' : ''}`}
                     >
-                        <span>{loading ? 'Verifying Access...' : 'Shopkeeper Login'}</span>
+                        <span>{loading ? 'Verifying Admin Access...' : 'Master Admin Login'}</span>
                         <ArrowRight className="w-4 h-4" />
                     </button>
                 </form>
 
                 <div className="pt-2 border-t border-slate-800 flex flex-col items-center gap-2 text-xs">
-                    <Link to="/owner/register" className="text-teal-400 font-bold hover:underline">
-                        Need a Shopkeeper Account? Register here →
+                    <Link to="/owner/login" className="text-amber-400 font-bold hover:underline">
+                        Shopkeeper Login →
                     </Link>
-                    <Link to="/admin/login" className="text-amber-400 hover:underline">
-                        Master Admin Login →
+                    <Link to="/login" className="text-slate-500 hover:text-slate-300 transition">
+                        Return to User Login
                     </Link>
                 </div>
 
@@ -135,4 +150,4 @@ const OwnerLogin = () => {
     );
 };
 
-export default OwnerLogin;
+export default AdminLogin;
